@@ -29,6 +29,7 @@ THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #endif
 
 
+#include <limits.h>
 #include <stdio.h>
 #include "Xlibint.h"
 #include "XKBlibint.h"
@@ -458,6 +459,8 @@ _XkbGeomAlloc(XPointer *old,
     if ((*old) == NULL)
         *num = *total = 0;
 
+    if (_X_UNLIKELY((*num) + num_new > USHRT_MAX))
+        return BadValue;
     if ((*num) + num_new <= (*total))
         return Success;
 

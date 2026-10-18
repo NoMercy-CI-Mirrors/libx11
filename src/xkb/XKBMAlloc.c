@@ -29,6 +29,7 @@ THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #endif
 
 
+#include <limits.h>
 #include <stdio.h>
 #include "Xlibint.h"
 #include <X11/extensions/XKBproto.h>
@@ -72,6 +73,8 @@ XkbAllocClientMap(XkbDescPtr xkb, unsigned which, unsigned nTotalTypes)
             map->num_types = map->size_types = 0;
         }
         if ((map->types == NULL) || (map->size_types < nTotalTypes)) {
+            if (_X_UNLIKELY(nTotalTypes > USHRT_MAX))
+                return BadValue;
             _XkbResizeArray(map->types, map->size_types, nTotalTypes,
                             XkbKeyTypeRec);
 
@@ -164,6 +167,8 @@ XkbAllocServerMap(XkbDescPtr xkb, unsigned which, unsigned nNewActions)
             unsigned need;
 
             need = map->num_acts + nNewActions;
+            if (_X_UNLIKELY(need > USHRT_MAX))
+                return BadValue;
             _XkbResizeArray(map->acts, map->size_acts, need, XkbAction);
             if (map->acts == NULL) {
                 map->num_acts = map->size_acts = 0;
@@ -273,7 +278,7 @@ XkbAddKeyType(XkbDescPtr xkb,
     XkbKeyTypePtr type;
     XkbClientMapPtr map;
 
-    if ((!xkb) || (num_lvls < 1))
+    if ((!xkb) || (num_lvls < 1) || (num_lvls > UCHAR_MAX))
         return NULL;
     map = xkb->map;
     if ((map) && (map->types)) {
@@ -353,7 +358,7 @@ XkbResizeKeyType(XkbDescPtr xkb,
     KeyCode matchingKeys[XkbMaxKeyCount], nMatchingKeys;
 
     if ((type_ndx < 0) || (type_ndx >= xkb->map->num_types) || (map_count < 0)
-        || (new_num_lvls < 1))
+        || (new_num_lvls < 1) || (new_num_lvls > UCHAR_MAX))
         return BadValue;
     switch (type_ndx) {
     case XkbOneLevelIndex:
@@ -540,7 +545,7 @@ XkbResizeKeyType(XkbDescPtr xkb,
 KeySym *
 XkbResizeKeySyms(XkbDescPtr xkb, int key, int needed)
 {
-    register int i, nSyms, nKeySyms;
+    register int i, nSyms, nKeySyms, to_add;
     unsigned nOldSyms;
     KeySym *newSyms;
 
@@ -565,7 +570,10 @@ XkbResizeKeySyms(XkbDescPtr xkb, int key, int needed)
         xkb->map->num_syms += needed;
         return &xkb->map->syms[xkb->map->key_sym_map[key].offset];
     }
-    xkb->map->size_syms += (needed > 32 ? needed : 32);
+    to_add = (needed > 32 ? needed : 32);
+    if (_X_UNLIKELY((xkb->map->size_syms + to_add) > USHRT_MAX))
+        return NULL;
+    xkb->map->size_syms += to_add;
     newSyms = _XkbTypedCalloc(xkb->map->size_syms, KeySym);
     if (newSyms == NULL)
         return NULL;
@@ -809,6 +817,8 @@ XkbResizeKeyActions(XkbDescPtr xkb, int key, int needed)
         xkb->server->num_acts += needed;
         return &xkb->server->acts[xkb->server->key_acts[key]];
     }
+    if (_X_UNLIKELY((xkb->server->num_acts + needed + 8) > USHRT_MAX))
+        return NULL;
     xkb->server->size_acts = xkb->server->num_acts + needed + 8;
     newActs = _XkbTypedCalloc(xkb->server->size_acts, XkbAction);
     if (newActs == NULL)

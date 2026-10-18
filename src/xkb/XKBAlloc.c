@@ -29,6 +29,7 @@ THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #endif
 
 
+#include <limits.h>
 #include <stdio.h>
 #include "Xlibint.h"
 #include "XKBlibint.h"
@@ -47,6 +48,8 @@ XkbAllocCompatMap(XkbDescPtr xkb, unsigned which, unsigned nSI)
 
     if (!xkb)
         return BadMatch;
+    if (_X_UNLIKELY(nSI > USHRT_MAX))
+        return BadValue;
     if (xkb->compat) {
         if (xkb->compat->size_si >= nSI)
             return Success;
@@ -143,6 +146,8 @@ XkbAllocNames(XkbDescPtr xkb, unsigned which, int nTotalRG, int nTotalAliases)
             return BadAlloc;
     }
     if ((which & XkbKeyAliasesMask) && (nTotalAliases > 0)) {
+        if (_X_UNLIKELY(nTotalAliases > UCHAR_MAX))
+            return BadValue;
         if ((names->key_aliases == NULL) ||
             (nTotalAliases > names->num_key_aliases)) {
             _XkbResizeArray(names->key_aliases, names->num_key_aliases,
@@ -155,6 +160,8 @@ XkbAllocNames(XkbDescPtr xkb, unsigned which, int nTotalRG, int nTotalAliases)
         names->num_key_aliases = nTotalAliases;
     }
     if ((which & XkbRGNamesMask) && (nTotalRG > 0)) {
+        if (_X_UNLIKELY(nTotalRG > USHRT_MAX))
+            return BadValue;
         if ((names->radio_groups == NULL) || (nTotalRG > names->num_rg)) {
             _XkbResizeArray(names->radio_groups, names->num_rg, nTotalRG, Atom);
         }
@@ -366,6 +373,8 @@ XkbResizeDeviceButtonActions(XkbDeviceInfoPtr devi, unsigned newTotal)
         devi->num_btns = 0;
         return BadAlloc;
     }
+    if (_X_UNLIKELY(newTotal > USHRT_MAX))
+        return BadValue;
     if (newTotal > devi->num_btns) {
         XkbAction *act;
 
@@ -381,6 +390,9 @@ XkbDeviceInfoPtr
 XkbAllocDeviceInfo(unsigned deviceSpec, unsigned nButtons, unsigned szLeds)
 {
     XkbDeviceInfoPtr devi;
+
+    if (_X_UNLIKELY(nButtons > USHRT_MAX) || _X_UNLIKELY(szLeds > USHRT_MAX))
+        return NULL;
 
     devi = _XkbTypedCalloc(1, XkbDeviceInfoRec);
     if (devi != NULL) {
