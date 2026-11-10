@@ -27,6 +27,8 @@ The primary development code repository can be found at:
 
 Please submit bug reports and requests to merge patches there.
 
+For security issues, please follow the process described in [SECURITY.md](SECURITY.md).
+
 For patch submission instructions, see:
 
   https://www.x.org/wiki/Development/Documentation/SubmittingPatches
