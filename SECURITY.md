@@ -28,7 +28,7 @@ This policy covers libX11 and the following associated X client libraries:
 - [libXi](https://gitlab.freedesktop.org/xorg/lib/libXi/)
 - [libXinerama](https://gitlab.freedesktop.org/xorg/lib/libXinerama/)
 - [libICE](https://gitlab.freedesktop.org/xorg/lib/libICE/)
-- [libXmu](https://gitlab.freedesktop.org/xorg/lib/libXmu/) / [libXmuu](https://gitlab.freedesktop.org/xorg/lib/libXmuu/)
+- [libXmu](https://gitlab.freedesktop.org/xorg/lib/libXmu/)
 - [libXp](https://gitlab.freedesktop.org/xorg/lib/libXp/) / [libXprintUtil](https://gitlab.freedesktop.org/xorg/lib/libXprintUtil/)
 - [libXrandr](https://gitlab.freedesktop.org/xorg/lib/libXrandr/)
 - [libXrender](https://gitlab.freedesktop.org/xorg/lib/libXrender/)
